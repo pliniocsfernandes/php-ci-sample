@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="myproject" default="build">
+<project name="myproject" default="build" basedir="..">
     <target name="build"
         depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,phpunit,phpcb"/>
 
@@ -21,20 +21,19 @@
     </target>
 
     <target name="clean" description="Cleanup build artifacts">
-        <delete dir="${basedir}/build/api"/>
-        <delete dir="${basedir}/build/code-browser"/>
-        <delete dir="${basedir}/build/coverage"/>
-        <delete dir="${basedir}/build/logs"/>
-        <delete dir="${basedir}/build/pdepend"/>
+        <delete dir="${basedir}/build/artifacts/api"/>
+        <delete dir="${basedir}/build/artifacts/code-browser"/>
+        <delete dir="${basedir}/build/artifacts/coverage"/>
+        <delete dir="${basedir}/build/artifacts/logs"/>
+        <delete dir="${basedir}/build/artifacts/pdepend"/>
     </target>
 
     <target name="prepare" depends="clean" description="Prepare for build">
-        <mkdir dir="${basedir}/build/api"/>
-        <mkdir dir="${basedir}/build/code-browser"/>
-        <mkdir dir="${basedir}/build/coverage"/>
-        <mkdir dir="${basedir}/build/logs"/>
-        <mkdir dir="${basedir}/build/pdepend"/>
-        <mkdir dir="${basedir}/build/phpdox"/>
+        <mkdir dir="${basedir}/build/artifacts/api"/>
+        <mkdir dir="${basedir}/build/artifacts/code-browser"/>
+        <mkdir dir="${basedir}/build/artifacts/coverage"/>
+        <mkdir dir="${basedir}/build/artifacts/logs"/>
+        <mkdir dir="${basedir}/build/artifacts/pdepend"/>
     </target>
 
     <target name="lint" description="Perform syntax check of sourcecode files">
@@ -56,16 +55,16 @@
     <target name="phploc" description="Measure project size using PHPLOC">
         <exec executable="phploc">
             <arg value="--log-csv"/>
-            <arg value="${basedir}/build/logs/phploc.csv"/>
+            <arg value="${basedir}/build/artifacts/logs/phploc.csv"/>
             <arg path="${basedir}/src"/>
         </exec>
     </target>
 
     <target name="pdepend" description="Calculate software metrics using PHP_Depend">
         <exec executable="pdepend">
-            <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml"/>
-            <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg"/>
-            <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg"/>
+            <arg value="--jdepend-xml=${basedir}/build/artifacts/logs/jdepend.xml"/>
+            <arg value="--jdepend-chart=${basedir}/build/artifacts/pdepend/dependencies.svg"/>
+            <arg value="--overview-pyramid=${basedir}/build/artifacts/pdepend/overview-pyramid.svg"/>
             <arg path="${basedir}/src"/>
         </exec>
     </target>
@@ -75,7 +74,7 @@
         <exec executable="phpmd">
             <arg path="${basedir}/src"/>
             <arg value="text"/>
-            <arg value="${basedir}/phpmd.xml"/>
+            <arg value="${basedir}/build/phpmd.xml"/>
         </exec>
     </target>
 
@@ -84,9 +83,9 @@
         <exec executable="phpmd">
             <arg path="${basedir}/src"/>
             <arg value="xml"/>
-            <arg value="${basedir}/phpmd.xml"/>
+            <arg value="${basedir}/build/phpmd.xml"/>
             <arg value="--reportfile"/>
-            <arg value="${basedir}/build/logs/pmd.xml"/>
+            <arg value="${basedir}/build/artifacts/logs/pmd.xml"/>
         </exec>
     </target>
 
@@ -102,7 +101,7 @@
         description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
         <exec executable="phpcs" output="/dev/null">
             <arg value="--report=checkstyle"/>
-            <arg value="--report-file=${basedir}/build/logs/checkstyle.xml"/>
+            <arg value="--report-file=${basedir}/build/artifacts/logs/checkstyle.xml"/>
             <arg value="--standard=PSR"/>
             <arg path="${basedir}/src"/>
         </exec>
@@ -113,7 +112,7 @@
             <arg line="--min-lines 1" />
             <arg line="--min-tokens 2" />
             <arg value="--log-pmd"/>
-            <arg value="${basedir}/build/logs/pmd-cpd.xml"/>
+            <arg value="${basedir}/build/artifacts/logs/pmd-cpd.xml"/>
             <arg path="${basedir}/src"/>
         </exec>
     </target>
@@ -124,22 +123,24 @@
     <target name="phpdoc" description="Generate API documentation using PHPDocumentor 2">
         <exec executable="phpdoc">
             <arg line="-d ${basedir}/src"/>
-            <arg line="-t ${basedir}/build/api"/>
+            <arg line="-t ${basedir}/build/artifacts/api"/>
         </exec>
     </target>
 
     <target name="phpunit" description="Run unit tests with PHPUnit">
-        <exec executable="phpunit" failonerror="true"/>
+        <exec executable="phpunit" failonerror="true">
+            <arg line="-c ${basedir}/build/phpunit.xml.dist" />
+        </exec>
     </target>
 
     <target name="phpcb" description="Aggregate tool output with PHP_CodeBrowser">
         <exec executable="phpcb">
             <arg value="--log"/>
-            <arg path="${basedir}/build/logs"/>
+            <arg path="${basedir}/build/artifacts/logs"/>
             <arg value="--source"/>
             <arg path="${basedir}/src"/>
             <arg value="--output"/>
-            <arg path="${basedir}/build/code-browser"/>
+            <arg path="${basedir}/build/artifacts/code-browser"/>
         </exec>
     </target>
 </project>
