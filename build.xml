@@ -111,7 +111,7 @@
     <target name="phpcpd" description="Find duplicate code using PHPCPD">
         <exec executable="phpcpd">
             <arg line="--min-lines 1" />
-            <arg line="--min-tokens 1" />
+            <arg line="--min-tokens 2" />
             <arg value="--log-pmd"/>
             <arg value="${basedir}/build/logs/pmd-cpd.xml"/>
             <arg path="${basedir}/src"/>
